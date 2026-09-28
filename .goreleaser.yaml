@@ -1,0 +1,44 @@
+version: 2
+
+project_name: crafttrace
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: crafttrace
+    main: ./cmd/crafttrace
+    binary: crafttrace
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/sysrqio/crafttrace/internal/sbom.versionString={{.Version}}
+
+archives:
+  - formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+
+release:
+  github:
+    owner: sysrqio
+    name: crafttrace
